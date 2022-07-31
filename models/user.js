@@ -2,6 +2,38 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
+const HouseSchema = mongoose.Schema({
+  type: {
+    type: String,
+    enum: ["Appartment", "Condo", "Family house", "Semi-Detached"],
+    required: [true, "Please select type of house"],
+  },
+  description: {
+    type: String,
+    required: [true, "Please describe your house"],
+    maxlength: 255,
+  },
+  address: {
+    type: String,
+    required: [true, "Please enter the house address"],
+    maxlength: 225,
+  },
+  price: {
+    type: Number,
+    required: [true, "Please enter the price per month"],
+    maxlength: 255,
+  },
+  location: {
+    type: String,
+    required: [true, "Please describe your house"],
+    maxlength: 255,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now(),
+  },
+});
+
 const UserSchema = mongoose.Schema({
   firstname: {
     type: String,
@@ -45,6 +77,11 @@ const UserSchema = mongoose.Schema({
     minlength: 3,
     maxlength: 100,
   },
+  house: [HouseSchema],
+  accountDate: {
+    type: Date,
+    default: Date.now(),
+  }
 });
 
 // hashing user password
@@ -55,6 +92,7 @@ UserSchema.pre("save", async function () {
 
 // creating json web token
 UserSchema.methods.createJWT = function () {
+
   return jwt.sign(
     { userId: this._id, fullName: `${this.firtname} ${this.lastname}` },
     process.env.JWT_SECRET,
