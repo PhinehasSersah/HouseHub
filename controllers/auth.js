@@ -28,11 +28,39 @@ const register = async (req, res) => {
   const token = user.createJWT();
   res.status(StatusCodes.CREATED).json({
     user: { firstname: user.firstname, lastname: user.lastname },
-    token: token,
+    token,
   });
+};
+const editDetails = async (req, res) => {
+  const {
+    body: { firstname, lastname, email, phone, address, avatar },
+    params: { id },
+  } = req;
+  if (!firstname || !lastname || !email) {
+    throw new BadRequestError("Please provide firstname, lastname and email");
+  }
+  const user = await User.findByIdAndUpdate(
+    {
+      _id: id,
+    },
+    req.body,
+    { new: true, runValidators: true }
+  );
+  res.status(StatusCodes.ACCEPTED).json({ user });
+};
+const deleteUser = async (req, res) => {
+  const { userId } = req.params;
+  try {
+    await User.findByIdAndRemove({ _id: userId });
+    res.status(StatusCodes.OK).send("Account deleted successfully");
+  } catch (err) {
+    throw new BadRequestError("Something went wrong, please try again later");
+  }
 };
 
 module.exports = {
   login,
   register,
+  editDetails,
+  deleteUser
 };
