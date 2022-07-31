@@ -1,7 +1,7 @@
 require("dotenv").config();
 require("express-async-errors");
 const express = require("express");
-const app = express();
+const app = express(); 
 const bodyParser = require("body-parser");
 const connectDb = require("./database/db");
 const userRouter = require("./routes/users");
