@@ -6,8 +6,12 @@ const bodyParser = require("body-parser");
 const connectDb = require("./database/db");
 const userRouter = require("./routes/users");
 
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+
+
 // signup and login routes
 app.use("/api/v1/househub", userRouter);
 
