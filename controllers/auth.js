@@ -33,7 +33,7 @@ const register = async (req, res) => {
 };
 const editDetails = async (req, res) => {
   const {
-    body: { firstname, lastname, email},
+    body: { firstname, lastname, email },
     params: { id },
   } = req;
   if (!firstname || !lastname || !email) {
@@ -46,7 +46,6 @@ const editDetails = async (req, res) => {
     req.body,
     { new: true, runValidators: true }
   );
-  console.log(req.file);
   res.status(StatusCodes.ACCEPTED).json({ user });
 };
 const deleteUser = async (req, res) => {
@@ -63,5 +62,5 @@ module.exports = {
   login,
   register,
   editDetails,
-  deleteUser
+  deleteUser,
 };
