@@ -27,7 +27,7 @@ const HouseSchema = mongoose.Schema(
       maxlength: 255,
     },
     images: {
-      type: Buffer,
+      type: [String],
     },
     createdAt: {
       type: Date,

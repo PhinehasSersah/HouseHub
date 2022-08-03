@@ -39,6 +39,9 @@ const editDetails = async (req, res) => {
   if (!firstname || !lastname || !email) {
     throw new BadRequestError("Please provide firstname, lastname and email");
   }
+  if (req.file) {
+    req.body.avatar = req.file.filename;
+  }
   const user = await User.findByIdAndUpdate(
     {
       _id: id,
