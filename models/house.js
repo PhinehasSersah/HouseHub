@@ -38,6 +38,10 @@ const HouseSchema = mongoose.Schema(
       ref: "User",
       required: [true, "Please provide user"],
     },
+    rentedStatus: {
+      type:Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

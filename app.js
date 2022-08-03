@@ -5,6 +5,7 @@ const app = express();
 const bodyParser = require("body-parser");
 const connectDb = require("./database/db");
 const userRouter = require("./routes/users");
+const houseRouter = require("./routes/house");
 
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -14,6 +15,7 @@ app.use(bodyParser.json());
 
 // signup and login routes
 app.use("/api/v1/househub", userRouter);
+app.use("/api/v1/househub", houseRouter);
 
 const port = process.env.PORT || 3000;
 
