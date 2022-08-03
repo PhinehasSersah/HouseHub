@@ -28,6 +28,7 @@ const HouseSchema = mongoose.Schema(
     },
     images: {
       type: [String],
+      required: [true, "Please upload house images"]
     },
     createdAt: {
       type: Date,
