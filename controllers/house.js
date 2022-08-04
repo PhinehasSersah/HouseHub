@@ -26,18 +26,15 @@ const getAllHouse = async (req, res) => {
     throw new error();
   }
 };
+
 // updating house details
 const updateHouse = async (req, res) => {
   const {
-    body: { type, description, address, price, location },
     params: { id: houseId },
     user: { userId },
   } = req;
-  if (!type || !description || !address || !price || !location) {
-    throw new BadRequestError("Please provide all required fields");
-  }
   try {
-    const house = await House.findByIdAndUpdate(
+    const house = await House.findOneAndUpdate(
       { _id: houseId, createdBy: userId },
       req.body,
       { new: true, runValidators: true }
@@ -54,8 +51,9 @@ const deleteHouse = async (req, res) => {
       user: { userId },
     } = req;
     await House.findByIdAndRemove({ _id: houseId, createdBy: userId });
+    res.status(StatusCodes.OK).json({ msg: "House deleted successfully" });
   } catch (error) {
-    throw new BadRequestError("Unable to delete, please try again");
+    throw new BadRequestError("Unable to delete house, please try again");
   }
 };
 const toggleRentedStatus = async (req, res) => {
@@ -66,12 +64,12 @@ const toggleRentedStatus = async (req, res) => {
   } = req;
   if (!rentedStatus) throw new BadRequestError("Please select rented status");
   try {
-    const rented = await House.findByIdAndUpdate(
+    const rented = await House.findOneAndUpdate(
       {
         _id: houseId,
         createdBy: userId,
       },
-      req.body.rentedStatus,
+      req.body,
       { new: true, runValidators: true }
     );
     res.status(StatusCodes.OK).json(rented.rentedStatus);

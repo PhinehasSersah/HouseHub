@@ -1,6 +1,6 @@
 const express = require("express");
 const userRouter = express.Router();
-const { upload, resizeImage } = require("../controllers/multer");
+const { upload, resizeUserImage } = require("../controllers/multer");
 const authenticateUser = require("../middleware/authenticate");
 
 const {
@@ -14,7 +14,7 @@ userRouter.post("/signup", register);
 userRouter.post("/login", login);
 userRouter
   .route("/profile/:id")
-  .patch(authenticateUser, upload.single("avatar"), resizeImage, editDetails)
+  .patch(authenticateUser, upload.single("avatar"), resizeUserImage, editDetails)
   .delete(deleteUser);
 
 module.exports = userRouter;

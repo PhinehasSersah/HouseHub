@@ -29,18 +29,43 @@ const upload = multer({
 
 //Resizing images
 
-const resizeImage = (req, res, next) => {
+const resizeUserImage = async (req, res, next) => {
   if (!req.file) return next();
   req.file.filename = `user-${req.user.userId}-${Date.now()}.jpeg`;
-  sharp(req.file.buffer)
-    .resize(500, 500)
-    .toFormat("jpeg")
-    .jpeg({ quality: 70 })
-    .toFile(`public/users/${req.file.filename}`);
-    next()
+  try {
+    await sharp(req.file.buffer)
+      .resize(500, 500)
+      .toFormat("jpeg")
+      .jpeg({ quality: 70 })
+      .toFile(`public/users/${req.file.filename}`);
+  } catch (error) {
+    next(error);
+  }
+};
+const resizeHouseImage = async (req, res, next) => {
+  if (req.files.length === 0) {
+    return next();
+  } else {
+    req.body.images = [];
+    await Promise.all(
+      req.files.map(async (file, index) => {
+        req.files.filename = `house-${req.params.id}-${Date.now()}-${
+          index + 1
+        }.jpeg`;
+        await sharp(file.buffer)
+          .resize(500, 500)
+          .toFormat("jpeg")
+          .jpeg({ quality: 70 })
+          .toFile(`public/house/${req.files.filename}`);
+        req.body.images.push(req.files.filename);
+      })
+    );
+    next();
+  }
 };
 
 module.exports = {
   upload,
-  resizeImage,
+  resizeUserImage,
+  resizeHouseImage,
 };
