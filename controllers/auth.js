@@ -1,7 +1,10 @@
 const User = require("../models/user");
+const jwt = require("jsonwebtoken");
 const { StatusCodes } = require("http-status-codes");
 const { BadRequestError, UnauthenticatedError } = require("../errors");
+const { resizeHouseImage } = require("./multer");
 
+// login handler
 const login = async (req, res) => {
   const { email, password } = req.body;
 
@@ -12,17 +15,27 @@ const login = async (req, res) => {
   if (!user) {
     throw new UnauthenticatedError("Invalid email");
   }
+
   const validatePassword = await user.comparePassword(password);
   if (!validatePassword) {
     throw new UnauthenticatedError("Invalid password");
   }
-
   const token = user.createJWT();
-  res.status(StatusCodes.OK).json({
-    user: { firstname: user.firstname, lastname: user.lastname },
-    token: token,
-  });
+  const refreshToken = user.createRefreshJWT();
+
+  res
+    .cookie("jwt", refreshToken, {
+      httpOnly: true,
+      maxAge: 60 * 60 * 24 * 1000,
+    })
+    .status(StatusCodes.OK)
+    .json({
+      user: { firstname: user.firstname, lastname: user.lastname },
+      token,
+    });
 };
+
+// register handler
 const register = async (req, res) => {
   const user = await User.create({ ...req.body });
   const token = user.createJWT();
@@ -31,6 +44,59 @@ const register = async (req, res) => {
     token,
   });
 };
+
+// refresh handler
+
+// if user email is not secured enough, I will use user.id as req.body
+const handleRefreshToken = async (req, res) => {
+  const { email } = req.body;
+  if (!email) {
+    throw new UnauthenticatedError("Missing user email address");
+  }
+  const cookies = req.cookies;
+  if (!cookies.jwt) {
+    throw new UnauthenticatedError("Invalid credentials");
+  }
+  
+  const refreshToken = cookies.jwt;
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw new UnauthenticatedError("Invalid user");
+  }
+  const payload = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+  if (!payload) {
+    throw new UnauthenticatedError("Invalid refresh token");
+  }
+  const token = user.createJWT();
+  res.json({ token });
+};
+// logout handler
+
+// if user email is not secured enough, I will use user.id as req.body
+const handleLogout = async (req, res) => {
+  const cookies = req.cookies;
+  if (!cookies.jwt) {
+    return res.status(StatusCodes.NO_CONTENT);
+  }
+  const refreshToken  = cookies.jwt
+
+  const { email } = req.body;
+  if (!email) {
+    return new UnauthenticatedError("Unauthorized user");
+  }
+  const user = await User.findOne({ email });
+  if (!user) {
+    return res
+    .status(StatusCodes.NO_CONTENT)
+    .clearCookie("jwt", { httpOnly: true, maxAge: 60 * 60 * 24 * 1000 })
+  }
+
+  res
+  .clearCookie("jwt", { httpOnly: true, maxAge: 60 * 60 * 24 * 1000 })
+  .status(StatusCodes.NO_CONTENT)
+};
+
+// edit user handler
 const editDetails = async (req, res) => {
   const {
     body: { firstname, lastname, email },
@@ -66,4 +132,6 @@ module.exports = {
   register,
   editDetails,
   deleteUser,
+  handleRefreshToken,
+  handleLogout,
 };

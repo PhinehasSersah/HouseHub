@@ -8,10 +8,14 @@ const {
   login,
   editDetails,
   deleteUser,
+  handleRefreshToken,
+  handleLogout
 } = require("../controllers/auth");
 
 userRouter.post("/signup", register);
 userRouter.post("/login", login);
+userRouter.get("/refresh", handleRefreshToken);
+userRouter.get("/logout", handleLogout);
 userRouter
   .route("/profile/:id")
   .patch(authenticateUser, upload.single("avatar"), resizeUserImage, editDetails)

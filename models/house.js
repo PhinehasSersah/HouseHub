@@ -3,7 +3,7 @@ const HouseSchema = mongoose.Schema(
   {
     type: {
       type: String,
-      enum: ["Appartment", "Condo", "Family house", "Semi-Detached"],
+      enum: ["House", "Apartment", "Office ", "Shop","Warehouse", "Guest house"],
       required: [true, "Please select type of house"],
     },
     description: {
@@ -11,10 +11,9 @@ const HouseSchema = mongoose.Schema(
       required: [true, "Please describe your house"],
       maxlength: 255,
     },
-    address: {
-      type: String,
-      required: [true, "Please enter the house address"],
-      maxlength: 225,
+    rooms: {
+      type: Number,
+      required: [true, "Please provide number of bedrooms"],
     },
     price: {
       type: Number,
@@ -28,7 +27,7 @@ const HouseSchema = mongoose.Schema(
     },
     images: {
       type: [String],
-      required: [true, "Please upload house images"]
+      required: [true, "Please upload house images"],
     },
     createdAt: {
       type: Date,
@@ -40,7 +39,7 @@ const HouseSchema = mongoose.Schema(
       required: [true, "Please provide user"],
     },
     rentedStatus: {
-      type:Boolean,
+      type: Boolean,
       default: false,
     },
   },

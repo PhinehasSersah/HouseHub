@@ -47,6 +47,9 @@ const UserSchema = mongoose.Schema({
     type: Date,
     default: Date.now(),
   },
+  // refreshToken: {
+  //   type: String,
+  // },
 });
 
 // hashing user password
@@ -62,6 +65,16 @@ UserSchema.methods.createJWT = function () {
     process.env.JWT_SECRET,
     {
       expiresIn: process.env.JWT_LIFETIME,
+    }
+  );
+};
+// refresh tokens 
+UserSchema.methods.createRefreshJWT = function () {
+  return jwt.sign(
+    { userId: this._id, fullName: `${this.firtname} ${this.lastname}` },
+    process.env.JWT_REFRESH_SECRET,
+    {
+      expiresIn: process.env.JWT_REFRESH_LIFETIME,
     }
   );
 };
