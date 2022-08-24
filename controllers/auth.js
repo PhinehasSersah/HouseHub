@@ -26,6 +26,8 @@ const login = async (req, res) => {
   res
     .cookie("jwt", refreshToken, {
       httpOnly: true,
+      // secure: true,
+      // sameSite: "None",
       maxAge: 60 * 60 * 24 * 1000,
     })
     .status(StatusCodes.OK)
@@ -49,51 +51,31 @@ const register = async (req, res) => {
 
 // if user email is not secured enough, I will use user.id as req.body
 const handleRefreshToken = async (req, res) => {
-  const { email } = req.body;
-  if (!email) {
-    throw new UnauthenticatedError("Missing user email address");
-  }
   const cookies = req.cookies;
-  if (!cookies.jwt) {
+  if (!cookies?.jwt) {
     throw new UnauthenticatedError("Invalid credentials");
   }
-  
   const refreshToken = cookies.jwt;
-  const user = await User.findOne({ email });
-  if (!user) {
-    throw new UnauthenticatedError("Invalid user");
-  }
   const payload = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
   if (!payload) {
     throw new UnauthenticatedError("Invalid refresh token");
   }
+  const user = await User.findOne({ email: payload.email });
+  if (!user) {
+    throw new UnauthenticatedError("Invalid user");
+  }
   const token = user.createJWT();
   res.json({ token });
 };
-// logout handler
 
 // if user email is not secured enough, I will use user.id as req.body
-const handleLogout = async (req, res) => {
+const handleLogout = (req, res) => {
   const cookies = req.cookies;
   if (!cookies.jwt) {
-    return res.status(StatusCodes.NO_CONTENT);
+    return res.status(StatusCodes.NO_CONTENT).send("No cookies");
   }
-  const refreshToken  = cookies.jwt
-
-  const { email } = req.body;
-  if (!email) {
-    return new UnauthenticatedError("Unauthorized user");
-  }
-  const user = await User.findOne({ email });
-  if (!user) {
-    return res
-    .status(StatusCodes.NO_CONTENT)
-    .clearCookie("jwt", { httpOnly: true, maxAge: 60 * 60 * 24 * 1000 })
-  }
-
-  res
-  .clearCookie("jwt", { httpOnly: true, maxAge: 60 * 60 * 24 * 1000 })
-  .status(StatusCodes.NO_CONTENT)
+  res.clearCookie("jwt", { httpOnly: true, sameSite: "none", secure: true });
+  return res.status(StatusCodes.NO_CONTENT).send("cookies has been sent");
 };
 
 // edit user handler
