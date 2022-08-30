@@ -1,8 +1,10 @@
 const User = require("../models/user");
 const jwt = require("jsonwebtoken");
+const multer = require("multer");
+const sharp = require("sharp");
 const { StatusCodes } = require("http-status-codes");
 const { BadRequestError, UnauthenticatedError } = require("../errors");
-const { resizeHouseImage } = require("./multer");
+// const { resizeHouseImage } = require("./multer");
 
 // login handler
 const login = async (req, res) => {
@@ -65,7 +67,10 @@ const handleRefreshToken = async (req, res) => {
     throw new UnauthenticatedError("Invalid user");
   }
   const token = user.createJWT();
-  res.json({ token });
+  res.json({
+    user: { firstname: user.firstname, lastname: user.lastname },
+    token,
+  });
 };
 
 // if user email is not secured enough, I will use user.id as req.body
@@ -76,6 +81,44 @@ const handleLogout = (req, res) => {
   }
   res.clearCookie("jwt", { httpOnly: true, sameSite: "none", secure: true });
   return res.status(StatusCodes.NO_CONTENT).send("cookies has been sent");
+};
+// multer
+// const multerStorage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     cb(null, "public/users");
+//   },
+//   filename: (req, file, cb) => {
+//     const ext = file.mimetype.split("/")[1];
+//     cb(null, `user-${req.user.id}-${Date.now()}.${ext}`);
+//   },
+// });
+const multerStorage = multer.memoryStorage();
+
+const multerFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith("image")) {
+    cb(null, true);
+  } else {
+    cb(new BadRequestError("Invalid file type, please upload image"));
+  }
+};
+
+const upload = multer({
+  storage: multerStorage,
+  fileFilter: multerFilter,
+});
+const uploadUserPhoto = upload.single("avatar");
+
+const resizeUserImage = async (req, res, next) => {
+  if (!req.file) return next();
+
+  req.file.filename = `user-${req.user.id}-${Date.now()}.jpeg`;
+  await sharp(req.file.buffer)
+    .resize(500, 500)
+    .toFormat("jpeg")
+    .jpeg({ quality: 90 })
+    .toFile(`public/users/${req.file.filename}`);
+
+  next();
 };
 
 // edit user handler
@@ -116,4 +159,6 @@ module.exports = {
   deleteUser,
   handleRefreshToken,
   handleLogout,
+  uploadUserPhoto,
+  resizeUserImage,
 };
