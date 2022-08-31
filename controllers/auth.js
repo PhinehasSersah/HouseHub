@@ -28,8 +28,8 @@ const login = async (req, res) => {
   res
     .cookie("jwt", refreshToken, {
       httpOnly: true,
-      // secure: true,
-      // sameSite: "None",
+      secure: true,
+      sameSite: "none",
       maxAge: 60 * 60 * 24 * 1000,
     })
     .status(StatusCodes.OK)
@@ -68,7 +68,6 @@ const handleRefreshToken = async (req, res) => {
   }
   const token = user.createJWT();
   res.json({
-    user: { firstname: user.firstname, lastname: user.lastname },
     token,
   });
 };

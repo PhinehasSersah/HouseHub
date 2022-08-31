@@ -23,6 +23,8 @@ const upload = multer({
 const uploadSpaceImages = upload.array("images", 4);
 // creating a new house
 const resizeHouseImage = async (req, res, next) => {
+  console.log(req.body, req.files)
+
   req.body.images = [];
 
   await Promise.all(
