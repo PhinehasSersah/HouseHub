@@ -71,7 +71,7 @@ UserSchema.methods.createJWT = function () {
 // refresh tokens 
 UserSchema.methods.createRefreshJWT = function () {
   return jwt.sign(
-    { userId: this._id, fullName: `${this.firtname} ${this.lastname}`, email: this.email },
+    { userId: this._id, fullName: `${this.firstname} ${this.lastname}`, email: this.email },
     process.env.JWT_REFRESH_SECRET,
     {
       expiresIn: process.env.JWT_REFRESH_LIFETIME,

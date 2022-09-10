@@ -3,7 +3,7 @@ const HouseSchema = mongoose.Schema(
   {
     type: {
       type: String,
-      enum: ["House", "Apartment", "Office ", "Shop","Warehouse", "Guest house"],
+      // enum: ["House", "Apartment", "Office ", "Shop","Warehouse", "Guest house"],
       required: [true, "Please select type of house"],
     },
     description: {
@@ -25,6 +25,11 @@ const HouseSchema = mongoose.Schema(
       required: [true, "Please describe your house"],
       maxlength: 255,
     },
+    address: {
+      type: String,
+      required: [true, "Please describe your house"],
+      maxlength: 255,
+    },
     images: {
       type: [String],
       required: [true, "Please upload house images"],
@@ -33,7 +38,7 @@ const HouseSchema = mongoose.Schema(
       type: Date,
       default: Date.now(),
     },
-    createdBy: {
+    createdById: {
       type: mongoose.Types.ObjectId,
       ref: "User",
       required: [true, "Please provide user"],
