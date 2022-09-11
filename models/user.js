@@ -29,11 +29,11 @@ const UserSchema = mongoose.Schema({
     required: [true, "Please provide a password"],
     minlength: 6,
   },
-  phone: {
-    type: Number,
-    minlength: 3,
-    maxlength: 100,
-  },
+  // phone: {
+  //   type: Number,
+  //   minlength: 3,
+  //   maxlength: 100,
+  // },
   address: {
     type: String,
     minlength: 3,
@@ -47,9 +47,6 @@ const UserSchema = mongoose.Schema({
     type: Date,
     default: Date.now(),
   },
-  // refreshToken: {
-  //   type: String,
-  // },
 });
 
 // hashing user password

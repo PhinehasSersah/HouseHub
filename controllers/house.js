@@ -50,10 +50,10 @@ const createHouse = async (req, res) => {
   // req.body.createdUser = req.user.name;
 
   try {
-    const house = await House.create(req.body);
+    await House.create(req.body);
     res
       .status(StatusCodes.CREATED)
-      .json({ success: true, message: "Space created successfully", house });
+      .json({ success: true, message: "Space created successfully" });
   } catch (error) {
     throw new error();
   }
@@ -65,7 +65,7 @@ const getAllHouse = async (req, res) => {
       "firstname",
       "lastname",
       "avatar",
-    ]);
+    ]).sort("-createdAt");
     res.status(StatusCodes.OK).json({ house });
   } catch (error) {
     throw new error();
