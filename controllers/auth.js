@@ -81,16 +81,8 @@ const handleLogout = (req, res) => {
   res.clearCookie("jwt", { httpOnly: true, sameSite: "none", secure: true });
   return res.status(StatusCodes.NO_CONTENT).send("cookies has been sent");
 };
-// multer
-// const multerStorage = multer.diskStorage({
-//   destination: (req, file, cb) => {
-//     cb(null, "public/users");
-//   },
-//   filename: (req, file, cb) => {
-//     const ext = file.mimetype.split("/")[1];
-//     cb(null, `user-${req.user.id}-${Date.now()}.${ext}`);
-//   },
-// });
+
+
 const multerStorage = multer.memoryStorage();
 
 const multerFilter = (req, file, cb) => {
@@ -110,13 +102,13 @@ const uploadUserPhoto = upload.single("avatar");
 const resizeUserImage = async (req, res, next) => {
   if (!req.file) return next();
 
-  req.file.filename = `user-${req.user.id}-${Date.now()}.jpeg`;
+  req.file.filename = `user-${Math.random()}-${Date.now()}.jpeg`;
   await sharp(req.file.buffer)
     .resize(500, 500)
     .toFormat("jpeg")
     .jpeg({ quality: 90 })
     .toFile(`public/users/${req.file.filename}`);
-
+    req.body.avatar = `/users/${req.file.filename}`
   next();
 };
 

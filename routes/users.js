@@ -11,16 +11,21 @@ const {
   handleRefreshToken,
   handleLogout,
   uploadUserPhoto,
-  resizeUserImage
+  resizeUserImage,
 } = require("../controllers/auth");
 
-userRouter.post("/signup", register);
+userRouter.post("/signup", uploadUserPhoto, resizeUserImage,
+
+
+register
+
+);
 userRouter.post("/login", login);
 userRouter.get("/refresh", handleRefreshToken);
 userRouter.get("/logout", handleLogout);
 userRouter
   .route("/profile/:id")
-  .patch(authenticateUser, uploadUserPhoto,resizeUserImage, editDetails)
+  .patch(authenticateUser, uploadUserPhoto, resizeUserImage, editDetails)
   .delete(deleteUser);
 
 module.exports = userRouter;

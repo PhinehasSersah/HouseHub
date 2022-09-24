@@ -60,12 +60,24 @@ const createHouse = async (req, res) => {
 };
 // getting all the house in the database
 const getAllHouse = async (req, res) => {
+  const { type, location, price, rooms } = req.query;
+  const queryObj = {};
+  if (type) {
+    queryObj.type = { $regex: type, $options: "i" };
+  }
+  if (location) {
+    queryObj.location = { $regex: location, $options: "i" };
+  }
+  if (price) {
+    queryObj.type = { $regex: type, $options: "i" };
+  }
+  if (rooms) {
+    queryObj.type = { $regex: type, $options: "i" };
+  }
   try {
-    const house = await House.find({}).populate("createdById", [
-      "firstname",
-      "lastname",
-      "avatar",
-    ]).sort("-createdAt");
+    const house = await House.find(queryObj)
+      .populate("createdById", ["firstname", "lastname", "avatar"])
+      .sort("-createdAt");
     res.status(StatusCodes.OK).json({ house });
   } catch (error) {
     throw new error();
