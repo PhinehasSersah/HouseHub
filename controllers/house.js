@@ -69,11 +69,27 @@ const getAllHouse = async (req, res) => {
     queryObj.location = { $regex: location, $options: "i" };
   }
   if (price) {
-    queryObj.type = { $regex: type, $options: "i" };
+    if (Number(price) === 500) {
+      queryObj.price = { $lte: Number(price) };
+    }
+    if (Number(price) === 1000) {
+      queryObj.price = { $lte: Number(price), $gte: 500 };
+    }
+    if (Number(price) === 5000) {
+      queryObj.price = { $lte: Number(price), $gte: 1000 };
+    }
+    if (Number(price) === 5001) {
+      queryObj.price = { $gte: Number(price) };
+    }
   }
   if (rooms) {
-    queryObj.type = { $regex: type, $options: "i" };
+    if (Number(rooms) === 5) {
+      queryObj.rooms = { $gte: Number(rooms) };
+    } else {
+      queryObj.rooms = { $lte: Number(rooms), $gte: Number(rooms) };
+    }
   }
+
   try {
     const house = await House.find(queryObj)
       .populate("createdById", ["firstname", "lastname", "avatar"])
