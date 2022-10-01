@@ -36,7 +36,7 @@ const UserSchema = mongoose.Schema({
   },
   avatar: {
     type: String,
-    default: 'default.png'
+    default: "default.png",
   },
   accountDate: {
     type: Date,
@@ -53,22 +53,35 @@ UserSchema.pre("save", async function () {
 // creating json web token
 UserSchema.methods.createJWT = function () {
   return jwt.sign(
-    { userId: this._id, fullName: `${this.firtname} ${this.lastname}`, email: this.email },
+    {
+      userId: this._id,
+      fullName: `${this.firtname} ${this.lastname}`,
+      email: this.email,
+    },
     process.env.JWT_SECRET,
     {
       expiresIn: process.env.JWT_LIFETIME,
     }
   );
 };
-// refresh tokens 
+// refresh tokens
 UserSchema.methods.createRefreshJWT = function () {
   return jwt.sign(
-    { userId: this._id, fullName: `${this.firstname} ${this.lastname}`, email: this.email },
+    {
+      userId: this._id,
+      fullName: `${this.firstname} ${this.lastname}`,
+      email: this.email,
+    },
     process.env.JWT_REFRESH_SECRET,
     {
       expiresIn: process.env.JWT_REFRESH_LIFETIME,
     }
   );
+};
+// hash update data password
+UserSchema.methods.hashPassword = async function () {
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
 };
 
 // comparing passwords

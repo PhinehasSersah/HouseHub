@@ -8,24 +8,25 @@ const {
   login,
   editDetails,
   deleteUser,
-  handleRefreshToken,
+  getUserDetails,
   handleLogout,
   uploadUserPhoto,
   resizeUserImage,
 } = require("../controllers/auth");
 
-userRouter.post("/signup", uploadUserPhoto, resizeUserImage,
+userRouter.post(
+  "/signup",
+  uploadUserPhoto,
+  resizeUserImage,
 
-
-register
-
+  register
 );
 userRouter.post("/login", login);
-userRouter.get("/refresh", handleRefreshToken);
+userRouter.get("/userdata", authenticateUser, getUserDetails);
 userRouter.get("/logout", handleLogout);
 userRouter
   .route("/profile/:id")
-  .patch(authenticateUser, uploadUserPhoto, resizeUserImage, editDetails)
+  .put(authenticateUser, uploadUserPhoto, resizeUserImage, editDetails)
   .delete(deleteUser);
 
 module.exports = userRouter;

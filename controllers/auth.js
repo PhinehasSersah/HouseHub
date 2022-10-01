@@ -1,5 +1,6 @@
 const User = require("../models/user");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
 const multer = require("multer");
 const sharp = require("sharp");
 const { StatusCodes } = require("http-status-codes");
@@ -34,7 +35,7 @@ const login = async (req, res) => {
     })
     .status(StatusCodes.OK)
     .json({
-      user: { firstname: user.firstname, lastname: user.lastname },
+      user,
       token,
     });
 };
@@ -52,23 +53,27 @@ const register = async (req, res) => {
 // refresh handler
 
 // if user email is not secured enough, I will use user.id as req.body
-const handleRefreshToken = async (req, res) => {
-  const cookies = req.cookies;
-  if (!cookies?.jwt) {
-    throw new UnauthenticatedError("Invalid credentials");
-  }
-  const refreshToken = cookies.jwt;
-  const payload = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
-  if (!payload) {
-    throw new UnauthenticatedError("Invalid refresh token");
-  }
-  const user = await User.findOne({ email: payload.email });
-  if (!user) {
+const getUserDetails = async (req, res) => {
+  // const cookies = req.cookies;
+  // if (!cookies?.jwt) {
+  //   throw new UnauthenticatedError("Invalid credentials");
+  // }
+  // const refreshToken = cookies.jwt;
+  // const payload = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+  // if (!payload) {
+  //   throw new UnauthenticatedError("Invalid refresh token");
+  // }
+  const { userId } = req.user;
+  if (!userId) {
     throw new UnauthenticatedError("Invalid user");
   }
-  const token = user.createJWT();
-  res.json({
-    token,
+  const user = await User.findOne({ _id: userId });
+  if (!user) {
+    throw new UnauthenticatedError("User not found");
+  }
+
+  res.status(StatusCodes.OK).json({
+    user,
   });
 };
 
@@ -81,7 +86,6 @@ const handleLogout = (req, res) => {
   res.clearCookie("jwt", { httpOnly: true, sameSite: "none", secure: true });
   return res.status(StatusCodes.NO_CONTENT).send("cookies has been sent");
 };
-
 
 const multerStorage = multer.memoryStorage();
 
@@ -108,31 +112,50 @@ const resizeUserImage = async (req, res, next) => {
     .toFormat("jpeg")
     .jpeg({ quality: 90 })
     .toFile(`public/users/${req.file.filename}`);
-    req.body.avatar = `/users/${req.file.filename}`
+  req.body.avatar = `/users/${req.file.filename}`;
   next();
 };
 
 // edit user handler
 const editDetails = async (req, res) => {
   const {
-    body: { firstname, lastname, email },
+    body: { firstname, lastname, email, newPassword, oldPassword, address },
     params: { id },
   } = req;
   if (!firstname || !lastname || !email) {
     throw new BadRequestError("Please provide firstname, lastname and email");
   }
+  const { userId } = req.user;
+  if (!userId) {
+    throw new UnauthenticatedError("Invalid user");
+  }
+  const foundUser = await User.findById(id);
+  if (newPassword === "" || undefined) {
+    req.body.password = foundUser.password;
+  } else {
+    const validatePassword = await foundUser.comparePassword(oldPassword);
+    if (!validatePassword) {
+      throw new UnauthenticatedError("Invalid password");
+    }
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+    req.body.password = hashedPassword;
+  }
+
   if (req.file) {
     req.body.avatar = req.file.filename;
   }
   const user = await User.findByIdAndUpdate(
     {
-      _id: id,
+      _id: userId,
     },
     req.body,
     { new: true, runValidators: true }
   );
   res.status(StatusCodes.ACCEPTED).json({ user });
 };
+
+// delete user
 const deleteUser = async (req, res) => {
   const { userId } = req.params;
   try {
@@ -148,7 +171,7 @@ module.exports = {
   register,
   editDetails,
   deleteUser,
-  handleRefreshToken,
+  getUserDetails,
   handleLogout,
   uploadUserPhoto,
   resizeUserImage,
