@@ -27,6 +27,6 @@ userRouter.get("/logout", handleLogout);
 userRouter
   .route("/profile/:id")
   .put(authenticateUser, uploadUserPhoto, resizeUserImage, editDetails)
-  .delete(deleteUser);
+  .delete(authenticateUser, deleteUser);
 
 module.exports = userRouter;

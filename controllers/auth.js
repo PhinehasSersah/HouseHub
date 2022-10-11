@@ -106,7 +106,7 @@ const uploadUserPhoto = upload.single("avatar");
 const resizeUserImage = async (req, res, next) => {
   if (!req.file) return next();
 
-  req.file.filename = `user-${Math.random()}-${Date.now()}.jpeg`;
+  req.file.filename = `user-${Math.floor(Math.random())}-${Date.now()}.jpeg`;
   await sharp(req.file.buffer)
     .resize(500, 500)
     .toFormat("jpeg")
@@ -142,8 +142,8 @@ const editDetails = async (req, res) => {
     req.body.password = hashedPassword;
   }
 
-  if (req.file) {
-    req.body.avatar = req.file.filename;
+  if (!req.file) {
+    req.body.avatar = foundUser.avatar;
   }
   const user = await User.findByIdAndUpdate(
     {
@@ -157,9 +157,9 @@ const editDetails = async (req, res) => {
 
 // delete user
 const deleteUser = async (req, res) => {
-  const { userId } = req.params;
+  const { id } = req.params;
   try {
-    await User.findByIdAndRemove({ _id: userId });
+    await User.findByIdAndRemove({ _id: id });
     res.status(StatusCodes.OK).send("Account deleted successfully");
   } catch (err) {
     throw new BadRequestError("Something went wrong, please try again later");
