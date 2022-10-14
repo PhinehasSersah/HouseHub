@@ -8,6 +8,7 @@ const {
   createHouse,
   updateHouse,
   deleteHouse,
+  getUserHouses,
   toggleRentedStatus,
   uploadSpaceImages,
   resizeHouseImage
@@ -21,7 +22,7 @@ houseRouter
     uploadSpaceImages,
     resizeHouseImage,
     createHouse
-  );
+  ).get(authenticateUser, getUserHouses);
 houseRouter
   .route("/rentaplace/:id")
   .patch(

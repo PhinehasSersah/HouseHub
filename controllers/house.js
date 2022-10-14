@@ -129,6 +129,11 @@ const deleteHouse = async (req, res) => {
     throw new BadRequestError("Unable to delete house, please try again");
   }
 };
+const getUserHouses = async (req, res) => {
+  const { userId } = req.user;
+  const house = await House.find({ createdBy: userId });
+  res.status(StatusCodes.OK).send({ house, count: house.length });
+};
 const toggleRentedStatus = async (req, res) => {
   const {
     body: { rentedStatus },
@@ -157,6 +162,7 @@ module.exports = {
   getAllHouse,
   createHouse,
   updateHouse,
+  getUserHouses,
   deleteHouse,
   toggleRentedStatus,
   uploadSpaceImages,
