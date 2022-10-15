@@ -131,8 +131,15 @@ const deleteHouse = async (req, res) => {
 };
 const getUserHouses = async (req, res) => {
   const { userId } = req.user;
-  const house = await House.find({ createdBy: userId });
-  res.status(StatusCodes.OK).send({ house, count: house.length });
+  try {
+    const house = await House.find({ createdById: userId }).populate(
+      "createdById",
+      ["firstname", "lastname", "avatar"]
+    );
+    res.status(StatusCodes.OK).send({ house, count: house.length });
+  } catch (error) {
+    throw new BadRequestError("Unable to find your spaces, please try again");
+  }
 };
 const toggleRentedStatus = async (req, res) => {
   const {
