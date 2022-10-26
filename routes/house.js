@@ -25,7 +25,7 @@ houseRouter
   ).get(authenticateUser, getUserHouses);
 houseRouter
   .route("/rentaplace/:id")
-  .patch(
+  .put(
     authenticateUser,
     // upload.array("images", 3),
     // resizeHouseImage,
