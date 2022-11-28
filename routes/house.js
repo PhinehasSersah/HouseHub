@@ -11,27 +11,23 @@ const {
   getUserHouses,
   toggleRentedStatus,
   uploadSpaceImages,
-  resizeHouseImage
+  resizeHouseImage,
 } = require("../controllers/house");
 
 houseRouter.route("/").get(getAllHouse);
 houseRouter
   .route("/rentaplace")
-  .post(
-    authenticateUser,
-    uploadSpaceImages,
-    resizeHouseImage,
-    createHouse
-  ).get(authenticateUser, getUserHouses);
+  .post(authenticateUser, uploadSpaceImages, resizeHouseImage, createHouse)
+  .get(authenticateUser, getUserHouses);
 houseRouter
   .route("/rentaplace/:id")
   .put(
     authenticateUser,
-    // upload.array("images", 3),
-    // resizeHouseImage,
+    uploadSpaceImages,
+    resizeHouseImage,
     updateHouse
   )
   .delete(authenticateUser, deleteHouse);
-houseRouter.route("/rented/:id").patch(authenticateUser, toggleRentedStatus);
+houseRouter.route("/rented/:id").put(authenticateUser, toggleRentedStatus);
 
 module.exports = houseRouter;

@@ -23,6 +23,12 @@ const upload = multer({
 const uploadSpaceImages = upload.array("images", 4);
 // creating a new house
 const resizeHouseImage = async (req, res, next) => {
+  if(!req.files) return next()
+
+  // if(req.file.length ===1) {
+
+  // }
+
   req.body.images = [];
 
   await Promise.all(
@@ -114,7 +120,7 @@ const updateHouse = async (req, res) => {
     );
     res.status(StatusCodes.OK).json({ house });
   } catch (error) {
-    throw new BadRequestError("Something went wrong, please try again");
+    throw new BadRequestError("Could not update house, please try again");
   }
 };
 const deleteHouse = async (req, res) => {
@@ -144,15 +150,16 @@ const getUserHouses = async (req, res) => {
 const toggleRentedStatus = async (req, res) => {
   const {
     body: { rentedStatus },
-    user: { userId },
+    // user: { userId },
     params: { id: houseId },
   } = req;
-  if (!rentedStatus) throw new BadRequestError("Please select rented status");
+  if (rentedStatus === null || undefined)
+    throw new BadRequestError("Please select rented status");
   try {
-    const rented = await House.findOneAndUpdate(
+    const rented = await House.findByIdAndUpdate(
       {
         _id: houseId,
-        createdBy: userId,
+        // createdById: userId,
       },
       req.body,
       { new: true, runValidators: true }
@@ -162,7 +169,7 @@ const toggleRentedStatus = async (req, res) => {
     throw new BadRequestError("Something went wrong, please try again");
   }
 
-  res.send("toggle house rented status...");
+  // res.send("toggle house rented status...");
 };
 
 module.exports = {
