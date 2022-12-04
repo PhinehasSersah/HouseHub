@@ -10,17 +10,14 @@ const userRouter = require("./routes/users");
 const houseRouter = require("./routes/house");
 const cookieParser = require("cookie-parser");
 const corsOptions = require("./config/corsOptions");
+const socket  =  require('./socket/connect')
 const {createServer} = require('http')
-const {Server}  = require('socket.io')
 const httpServer = createServer(app);
-const io =  new Server(httpServer, {
-  cors: corsOptions
-})
 
-io.on("connection", (socket)=>{
-  console.log('socket id is' + socket.id)
 
-})
+
+// socket io configurations 
+socket.socketIo(httpServer)
 
 // app.use(express.urlencoded({ extended: false }));
 app.use(bodyParser.json());
