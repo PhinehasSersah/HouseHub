@@ -10,6 +10,17 @@ const userRouter = require("./routes/users");
 const houseRouter = require("./routes/house");
 const cookieParser = require("cookie-parser");
 const corsOptions = require("./config/corsOptions");
+const {createServer} = require('http')
+const {Server}  = require('socket.io')
+const httpServer = createServer(app);
+const io =  new Server(httpServer, {
+  cors: corsOptions
+})
+
+io.on("connection", (socket)=>{
+  console.log('socket id is' + socket.id)
+
+})
 
 // app.use(express.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -32,7 +43,7 @@ const port = process.env.PORT || 3000;
 const start = async () => {
   try {
     await connectDb(process.env.MONGO_URI);
-    app.listen(port, () => {
+    httpServer.listen(port, () => {
       console.log("Server listening on port " + port);
     });
   } catch (error) {
