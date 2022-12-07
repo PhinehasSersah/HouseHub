@@ -53,8 +53,6 @@ const createHouse = async (req, res) => {
     throw new BadRequestError("Please provide all required fields");
   }
   req.body.createdById = req.user.userId;
-  // req.body.createdUser = req.user.name;
-
   try {
     await House.create(req.body);
     res

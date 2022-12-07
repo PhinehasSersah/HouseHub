@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const HouseSchema = mongoose.Schema(
   {
-    type: {
+    type: { 
       type: String,
       // enum: ["House", "Apartment", "Office ", "Shop","Warehouse", "Guest house"],
       required: [true, "Please select type of house"],
