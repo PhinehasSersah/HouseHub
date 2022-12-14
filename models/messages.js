@@ -3,16 +3,16 @@ const mongoose = require("mongoose");
 const MessageSchema = mongoose.Schema(
   {
     fromUser: {
-      type: mongoose.Types.ObjectId,
-      ref: "User",
+      type: String,
+      // required: true,
     },
     toUser: {
-      type: mongoose.Types.ObjectId,
-      ref: "User",
+      type: String,
+      // required :true
     },
     message: {
       type: String,
-      required: true,
+      // required: true,
     },
     date: {
       type: Date,

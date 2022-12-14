@@ -9,20 +9,22 @@ module.exports = {
     });
     // socket connection
     io.on("connection", (socket) => {
-      socket.on("message-owner", async (from, to, message) => {
+      socket.on("message-owner", async (messageBody) => {
+        const { toUser, fromUser, message } = messageBody;
         try {
           await Message.create({
-            fromUser: from,
-            toUser: to,
+            fromUser: fromUser,
+            toUser: toUser,
             message: message,
             date: Date.now(),
           });
 
-          const messages = await Message.find({ fromUser: from, toUser: to });
+          const messages = await Message.find({ fromUser, toUser });
 
           //  socket.emit("found-messages", messages)
-          io.to(socket.id).emit("found-messages", messages);
+          socket.emit("found-messages", messages);
         } catch (error) {
+          console.log(error);
           throw error;
         }
       });
