@@ -3,14 +3,17 @@ const mongoose = require("mongoose");
 const MessageSchema = mongoose.Schema(
   {
     fromUser: {
-      type: String,
-      // required: true,
+      type: mongoose.Types.ObjectId,
+      ref: "User",
+      required: true,
     },
     toUser: {
-      type: String,
-      // required :true
+      type: mongoose.Types.ObjectId,
+      ref: "User",
+      required: true,
     },
-    message: {
+
+    messageBody: {
       type: String,
       // required: true,
     },

@@ -1,7 +1,8 @@
 const mongoose = require("mongoose");
+// const MessageSchema = require("./messages");
 const HouseSchema = mongoose.Schema(
   {
-    type: { 
+    type: {
       type: String,
       // enum: ["House", "Apartment", "Office ", "Shop","Warehouse", "Guest house"],
       required: [true, "Please select type of house"],
@@ -46,6 +47,10 @@ const HouseSchema = mongoose.Schema(
     rentedStatus: {
       type: Boolean,
       default: false,
+    },
+    messages: {
+      type: mongoose.Types.ObjectId,
+      ref: "Message",
     },
   },
   { timestamps: true }

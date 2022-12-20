@@ -1,3 +1,4 @@
+const User = require("../models/user");
 const Message = require("../models/messages");
 const { StatusCodes } = require("http-status-codes");
 const { BadRequestError, NotFoundError } = require("../errors");
@@ -6,26 +7,23 @@ const allUserMessages = async (req, res) => {
   const { userId } = req.user;
 
   try {
-    const messages = await Message.find({ toUser: userId })
-    
+    const messages = await User.findById(userId);
+
     res.status(StatusCodes.OK).json({ messages });
   } catch (error) {
     throw new BadRequestError(error);
   }
 };
 
-const userMessage = async (req, res) => {
-  const {
-    user: { userId },
-    params: { id },
-  } = req;
-
+const sendMessage = async (req, res) => {
+  const { fromUser, toUser, messageBody } = req.body;
   try {
-    const messages = await Message.find({ toUser: userId, fromUser: id });
+    // const user = await User.findById(userId)
+    const messages = await Message.create({fromUser:fromUser, toUser:toUser, messageBody: messageBody, date: Date.now()});
     res.status(StatusCodes.OK).json({ messages });
   } catch (error) {
     throw new BadRequestError(error);
   }
 };
 
-module.exports = { allUserMessages, userMessage };
+module.exports = { allUserMessages, sendMessage };
