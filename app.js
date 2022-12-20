@@ -8,6 +8,7 @@ const bodyParser = require("body-parser");
 const connectDb = require("./database/db");
 const userRouter = require("./routes/users");
 const houseRouter = require("./routes/house");
+const messageRouter = require("./routes/messages");
 const cookieParser = require("cookie-parser");
 const corsOptions = require("./config/corsOptions");
 const socket  =  require('./socket/connect')
@@ -30,9 +31,10 @@ app.use(cookieParser());
 // handling cors
 app.use(cors(corsOptions));
 
-// signup and login routes
+// routes
 app.use("/api/v1/househub", userRouter);
 app.use("/api/v1/househub", houseRouter);
+app.use("/api/v1/househub", messageRouter);
 
 
 const port = process.env.PORT || 3000;

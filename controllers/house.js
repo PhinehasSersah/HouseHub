@@ -100,7 +100,7 @@ const getAllHouse = async (req, res) => {
       .sort("-createdAt");
     res.status(StatusCodes.OK).json({ house });
   } catch (error) {
-    throw new error();
+    throw new error;
   }
 };
 

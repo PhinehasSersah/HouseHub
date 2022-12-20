@@ -22,7 +22,7 @@ module.exports = {
           const messages = await Message.find({ fromUser, toUser });
 
           //  socket.emit("found-messages", messages)
-          socket.emit("found-messages", messages);
+          io.to(socket.id).emit("found-messages", messages);
         } catch (error) {
           console.log(error);
           throw error;
