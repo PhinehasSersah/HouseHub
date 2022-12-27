@@ -38,11 +38,19 @@ const UserSchema = mongoose.Schema({
     type: String,
     default: "default.png",
   },
+  newMessages: {
+    type: Object,
+    default: {},
+  },
+  status: {
+    type: String,
+    default: "offline",
+  },
   accountDate: {
     type: Date,
     default: Date.now(),
   },
-});
+}, {minimize: false});
 
 // hashing user password
 UserSchema.pre("save", async function () {

@@ -2,24 +2,25 @@ const mongoose = require("mongoose");
 
 const MessageSchema = mongoose.Schema(
   {
-    fromUser: {
-      type: mongoose.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
-    toUser: {
-      type: mongoose.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
-
     messageBody: {
       type: String,
-      // required: true,
+      required: true,
+    },
+    from: {
+      type: Object,
+      required: [true, "Message sender cannot be empty"],
+    },
+    socketId: {
+      type: String,
+      // required: [true, "Socket id required"],
     },
     date: {
       type: Date,
       default: Date.now(),
+    },
+    room: {
+      type: String,
+      required: [true, "message room required"],
     },
   },
   { timestamps: true }
