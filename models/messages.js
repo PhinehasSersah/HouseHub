@@ -6,9 +6,13 @@ const MessageSchema = mongoose.Schema(
       type: String,
       required: true,
     },
-    from: {
-      type: Object,
-      required: [true, "Message sender cannot be empty"],
+    fromUser: {
+      type: mongoose.Types.ObjectId,
+      required: true,
+    },
+    toUser: {
+      type: mongoose.Types.ObjectId,
+      required: true,
     },
     socketId: {
       type: String,

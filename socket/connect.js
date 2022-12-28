@@ -13,25 +13,6 @@ module.exports = {
     });
     // socket connection
     io.on("connection", (socket) => {
-      // socket.on("message-owner", async (messageBody) => {
-      //   // const { toUser, fromUser, message } = messageBody;
-      //   // try {
-      //   //   await Message.create({
-      //   //     fromUser: fromUser,
-      //   //     toUser: toUser,
-      //   //     message: message,
-      //   //     date: Date.now(),
-      //   //   });
-
-      //   // const messages = await Message.find({ fromUser, toUser });
-
-      //   //  socket.emit("found-messages", messages)
-      //   io.to(socket.id).emit("sent-messages", messageBody);
-      //   // } catch (error) {
-      //   //   console.log(error);
-      //   //   throw error;
-      //   // }
-      // });
 
       // at chat page clicking on a user message
       socket.on("contact-user", async (newRoom, previousRoom) => {
@@ -43,15 +24,19 @@ module.exports = {
       });
 
       // sending messages
-      socket.on("message-room", async (room, messageBody, from, date) => {
+      socket.on("message-owner", async (room, previousRoom, messageBody, fromUser, toUser, date) => {
+        socket.leave(previousRoom)
+        socket.join(room);
         await Message.create({
-          room,
           messageBody,
-          from,
+          fromUser,
+          toUser,
+          room,
+          socketId: socket.id,
           date,
         });
         let roomMessages = await getLastRoomMessage(room);
-        roomMessages = sortMessageByDate(roomMessages);
+        // roomMessages = sortMessageByDate(roomMessages);
         io.to(room).emit("room-messages", roomMessages);
       });
 
