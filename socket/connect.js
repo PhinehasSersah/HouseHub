@@ -3,7 +3,7 @@ const corsOptions = require("../config/corsOptions");
 const Message = require("../models/messages");
 const {
   getLastRoomMessage,
-  sortMessageByDate,
+  sortRoomMessagesByDate,
 } = require("../utils/message.services");
 
 module.exports = {
@@ -19,7 +19,7 @@ module.exports = {
         socket.join(newRoom);
         socket.leave(previousRoom);
         let roomMessages = await getLastRoomMessage(newRoom);
-        roomMessages = sortMessageByDate(roomMessages);
+        // roomMessages = sortMessageByDate(roomMessages);
         socket.emit("room-messages", roomMessages);
       });
 
@@ -36,7 +36,7 @@ module.exports = {
           date,
         });
         let roomMessages = await getLastRoomMessage(room);
-        // roomMessages = sortMessageByDate(roomMessages);
+        // roomMessages = sortRoomMessagesByDate(roomMessages);
         io.to(room).emit("room-messages", roomMessages);
       });
 

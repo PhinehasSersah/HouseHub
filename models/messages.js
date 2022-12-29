@@ -8,10 +8,12 @@ const MessageSchema = mongoose.Schema(
     },
     fromUser: {
       type: mongoose.Types.ObjectId,
+      ref: "User",
       required: true,
     },
     toUser: {
       type: mongoose.Types.ObjectId,
+      ref: "User",
       required: true,
     },
     socketId: {
