@@ -27,6 +27,8 @@ module.exports = {
       socket.on("message-owner", async (room, previousRoom, messageBody, fromUser, toUser, date) => {
         socket.leave(previousRoom)
         socket.join(room);
+
+        console.log(room, previousRoom)
         await Message.create({
           messageBody,
           fromUser,

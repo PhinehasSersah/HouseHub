@@ -6,15 +6,9 @@ const { getLastRoomMessage } = require("../utils/message.services");
 
 const allUserMessages = async (req, res) => {
   const { userId } = req.user;
-  console.log(userId);
   try {
     const allUsers = await User.find({});
-    let allUserIds = [];
-    allUserIds = allUsers.map((user) => {
-      return user._id;
-    });
     let messages = [];
-
     const orderIds = (id1, id2) => {
       if (id1 > id2) {
         return id1 + "-" + id2;
@@ -23,13 +17,14 @@ const allUserMessages = async (req, res) => {
       }
     };
 
-    for (let i = 0; i < allUserIds.length; i++) {
-      const roomId = orderIds(userId, allUserIds[i]);
+    for (let i = 0; i < allUsers.length; i++) {
+      const roomId = orderIds(userId, allUsers[i]._id);
       const roomMessages = await Message.find({ room: roomId })
         .populate("fromUser", ["firstname", "lastname", "avatar", "status"])
         .populate("toUser", ["firstname", "lastname", "avatar", "status"])
-        .sort("date");
-            if (roomMessages.length > 0) {
+        .sort("-date")
+        .limit(1);
+      if (roomMessages.length > 0) {
         messages.push(roomMessages);
       }
     }
@@ -60,4 +55,24 @@ const sendMessage = async (req, res) => {
   }
 };
 
-module.exports = { allUserMessages, sendMessage };
+const getClientMessage = async (req, res) => {
+  const { room } = req.params;
+  try {
+    const message = await getLastRoomMessage(room);
+    res.status(StatusCodes.OK).json({ message });
+  } catch (error) {
+    throw new BadRequestError(error);
+  }
+};
+
+const deleteSingleMessage = async (req, res) => {
+  const {
+    params: { id },
+    user: { userId },
+  } = req;
+ console.log(id)
+  const message = await Message.findByIdAndDelete(id);
+
+  res.status(StatusCodes.OK).json({ message });
+};
+module.exports = { allUserMessages, sendMessage, getClientMessage, deleteSingleMessage };
