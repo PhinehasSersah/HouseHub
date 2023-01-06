@@ -5,9 +5,17 @@ const { BadRequestError, NotFoundError } = require("../errors");
 const { getLastRoomMessage } = require("../utils/message.services");
 
 const allUserMessages = async (req, res) => {
-  const { userId } = req.user;
+  const {
+    user: { userId },
+    query: { name },
+  } = req;
+  let toSearch = new RegExp(name, "i");
+
   try {
-    const allUsers = await User.find({});
+    const allUsers = await User.find().or([
+      { firstname: { $regex: toSearch } },
+      { lastname: { $regex: toSearch } },
+    ]);
     let messages = [];
     const orderIds = (id1, id2) => {
       if (id1 > id2) {
@@ -20,8 +28,8 @@ const allUserMessages = async (req, res) => {
     for (let i = 0; i < allUsers.length; i++) {
       const roomId = orderIds(userId, allUsers[i]._id);
       const roomMessages = await Message.find({ room: roomId })
-        .populate("fromUser", ["firstname", "lastname", "avatar", "status"])
-        .populate("toUser", ["firstname", "lastname", "avatar", "status"])
+        .populate("fromUser", ["firstname", "lastname", "avatar", "status", "address"])
+        .populate("toUser", ["firstname", "lastname", "avatar", "status", "address"])
         .sort("-date")
         .limit(1);
       if (roomMessages.length > 0) {
@@ -32,7 +40,7 @@ const allUserMessages = async (req, res) => {
       messages,
     });
   } catch (error) {
-    console.log("key", error);
+    // console.log("key", error);
     throw new BadRequestError(error);
   }
 };
@@ -68,11 +76,16 @@ const getClientMessage = async (req, res) => {
 const deleteSingleMessage = async (req, res) => {
   const {
     params: { id },
-    user: { userId },
+    // user: { userId },
   } = req;
- console.log(id)
+  console.log(id);
   const message = await Message.findByIdAndDelete(id);
 
   res.status(StatusCodes.OK).json({ message });
 };
-module.exports = { allUserMessages, sendMessage, getClientMessage, deleteSingleMessage };
+module.exports = {
+  allUserMessages,
+  sendMessage,
+  getClientMessage,
+  deleteSingleMessage,
+};

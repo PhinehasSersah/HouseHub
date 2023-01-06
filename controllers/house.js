@@ -65,7 +65,7 @@ const createHouse = async (req, res) => {
 // getting all the house in the database
 const getAllHouse = async (req, res) => {
   const { type, location, price, rooms } = req.query;
-  const queryObj = {};
+  let queryObj = {};
   if (type) {
     queryObj.type = { $regex: type, $options: "i" };
   }
