@@ -23,7 +23,7 @@ const upload = multer({
 const uploadSpaceImages = upload.array("images", 4);
 // creating a new house
 const resizeHouseImage = async (req, res, next) => {
-  if(!req.files) return next()
+  if (!req.files) return next();
 
   // if(req.file.length ===1) {
 
@@ -100,7 +100,7 @@ const getAllHouse = async (req, res) => {
       .sort("-createdAt");
     res.status(StatusCodes.OK).json({ house });
   } catch (error) {
-    throw new error;
+    throw new error();
   }
 };
 
